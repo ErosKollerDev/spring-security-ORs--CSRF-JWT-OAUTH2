@@ -14,7 +14,7 @@ public class WelcomeController {
 
     @GetMapping("/")
     public ResponseEntity<String> welcome() {
-        return ResponseEntity.ok("Hello");
+        return ResponseEntity.ok("Welcome do Spring Boot Security with Security this Time");
     }
 
 }

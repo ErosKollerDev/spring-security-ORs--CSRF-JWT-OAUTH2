@@ -7,14 +7,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/welcome")
-public class WelcomeController {
+//@RequestMapping("")
+public class NoticesController {
 
 
 
-    @GetMapping("/")
-    public ResponseEntity<String> welcome() {
-        return ResponseEntity.ok("Welcome do Spring Boot Security with Security this Time");
+    @GetMapping("/notices")
+    public ResponseEntity<String> getNotices() {
+        return ResponseEntity.ok("My Notices");
     }
 
 }

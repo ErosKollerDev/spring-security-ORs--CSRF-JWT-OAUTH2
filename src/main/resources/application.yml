@@ -4,10 +4,10 @@
 Spring:
     application:
         name: ${SPRING_APP_SECURITY_NAME:springsection1}
-    security:
-      user:
-        name: ${SPRING_APP_SECURITY_USERNAME:WRONGNAME}
-        password: ${SPRING_APP_SECURITY_PASSWORD:WRONGPASSWORD}
+#    security:
+#      user:
+#        name: ${SPRING_APP_SECURITY_USERNAME:WRONGNAME}
+#        password: ${SPRING_APP_SECURITY_PASSWORD:WRONGPASSWORD}
 
 logging:
   pattern:

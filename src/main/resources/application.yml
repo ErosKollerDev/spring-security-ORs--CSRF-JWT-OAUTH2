@@ -2,12 +2,23 @@
 
 
 Spring:
-    application:
-        name: ${SPRING_APP_SECURITY_NAME:springsection1}
-#    security:
-#      user:
-#        name: ${SPRING_APP_SECURITY_USERNAME:WRONGNAME}
-#        password: ${SPRING_APP_SECURITY_PASSWORD:WRONGPASSWORD}
+  application:
+    name: ${SPRING_APP_SECURITY_NAME:springsection1}
+  #    security:
+  #      user:
+  #        name: ${SPRING_APP_SECURITY_USERNAME:WRONGNAME}
+  #        password: ${SPRING_APP_SECURITY_PASSWORD:WRONGPASSWORD}
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/eazybank?allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
+  jpa:
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
+    hibernate:
+      ddl-auto: ${SPRING_HIBERNATE_DDL_AUTO:update}
+    properties:
+      hibernate:
+        format_sql: ${SPRING_HIBERNATE_FORMAT_SQL:true}
 
 logging:
   pattern:

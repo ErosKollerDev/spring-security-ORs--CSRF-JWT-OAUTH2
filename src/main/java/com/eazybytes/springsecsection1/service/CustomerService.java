@@ -25,8 +25,9 @@ public class CustomerService {
         return customerRepository.findByEmail(email).orElse(null);
     }
 
-    public CustomerRepository findByEmailAndPwd(String email, String pwd) {
-        return customerRepository.findByEmailAndPwd(email, pwd);
+    public CustomerEntity findByEmailAndPwd(String email, String pwd) {
+        return customerRepository.findByEmailAndPwd(email, pwd)
+                .orElse(null);
     }
 
     public CustomerEntity save(CustomerEntity customerEntity) {

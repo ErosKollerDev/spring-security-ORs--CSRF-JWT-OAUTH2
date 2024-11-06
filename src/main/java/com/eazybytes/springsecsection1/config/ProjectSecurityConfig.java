@@ -26,7 +26,7 @@ public class ProjectSecurityConfig {
 //                            .permitAll();
 //                            .denyAll();
 //                        .authenticated()
-                    requests.requestMatchers("/my/**","/admin/**")
+                    requests.requestMatchers("/my/**", "/admin/**")
                             .authenticated()
                             .requestMatchers("/contact", "/notices", "/error")
                             .permitAll();
@@ -41,11 +41,12 @@ public class ProjectSecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService(DataSource dataSource) {
-        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-        return jdbcUserDetailsManager;
-    }
+    // We don't need this anymore cuz, we are using/implemeting UserDetailsService interface UserDetailsCustomService
+//    @Bean
+//    public UserDetailsService userDetailsService(DataSource dataSource) {
+//        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+//        return jdbcUserDetailsManager;
+//    }
 
 
     @Bean

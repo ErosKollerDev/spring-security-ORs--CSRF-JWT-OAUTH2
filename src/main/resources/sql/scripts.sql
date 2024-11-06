@@ -88,3 +88,6 @@ insert into customer(email, pwd, role)
 values ('user@gmail.com', '{noop}user', 'user');
 
 select * from customer;
+update customer
+set pwd = '{bcrypt}$2y$10$tRm9C0Mn3YR1Y72f62Kf/OlI8N28cHd2UiHTk9K1o.hqrOpbBOyuG'
+where email = 'eroskoller@gmail.com';

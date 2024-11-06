@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.eazybytes</groupId>
-    <artifactId>springsecsection1</artifactId>
+    <artifactId>SpringSecurityUdemy</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springsection02</name>
+    <name>SpringSecurityUdemy</name>
     <description>Spring Security Section 01</description>
     <url/>
     <licenses>

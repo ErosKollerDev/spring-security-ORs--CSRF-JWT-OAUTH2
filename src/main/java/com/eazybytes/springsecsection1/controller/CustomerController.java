@@ -4,10 +4,14 @@ import com.eazybytes.springsecsection1.dto.CustomerDTO;
 import com.eazybytes.springsecsection1.entity.CustomerEntity;
 import com.eazybytes.springsecsection1.service.CustomerService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/admin")
@@ -15,29 +19,40 @@ import java.util.List;
 public class CustomerController {
 
 
-    private CustomerService customerService;
+    private final CustomerService customerService;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/customers")
-    public ResponseEntity<List<CustomerEntity>> getCustomers(){
+    public ResponseEntity<List<CustomerEntity>> getCustomers() {
         return ResponseEntity.ok(customerService.getCustomers());
     }
 
     @GetMapping("/customers/by-email")
-    public ResponseEntity<CustomerEntity> getCustomersByEmail(@RequestParam("email") String emailPathVariable){
+    public ResponseEntity<CustomerEntity> getCustomersByEmail(@RequestParam("email") String emailPathVariable) {
         return ResponseEntity.ok(customerService.findByEmail(emailPathVariable));
     }
 
     @GetMapping("/customers/{id}")
-    public ResponseEntity<CustomerEntity> getCustomersById(@PathVariable("id") Long id){
+    public ResponseEntity<CustomerEntity> getCustomersById(@PathVariable("id") Long id) {
         CustomerEntity byId = customerService.findById(id);
         byId.setPwd(null);
         return ResponseEntity.ok(byId);
     }
 
     @PostMapping("/customers")
-    public ResponseEntity<CustomerEntity> saveCustomer(CustomerDTO customerDTO){
-        CustomerEntity saved = customerService.save(customerDTO);
-        return ResponseEntity.ok(saved);
+    public ResponseEntity saveCustomer(@RequestBody CustomerDTO customerDTO) {
+        try {
+            customerDTO.setPwd(this.passwordEncoder.encode(customerDTO.getPwd()));
+            CustomerEntity saved = customerService.save(customerDTO);
+            if (saved != null && saved.getId() != null) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to save customer");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+
     }
 
 

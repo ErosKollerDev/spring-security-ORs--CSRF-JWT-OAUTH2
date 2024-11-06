@@ -50,6 +50,7 @@ public class CustomerService {
 
     public CustomerEntity save(CustomerDTO customerDTO) {
         CustomerEntity customerEntity = CustomerMapper.INSTANCE.toCustomerEntity(customerDTO);
+//        CustomerEntity customerEntity = CustomerEntity.builder().email(customerDTO.getEmail()).pwd(customerDTO.getPwd()).role(customerDTO.getRole()).build();
         return customerRepository.save(customerEntity);
     }
 

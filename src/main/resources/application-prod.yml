@@ -2,10 +2,8 @@
 
 
 spring:
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:prod}
   config:
-    import: application.yml,application-prod.yml, application-local.yml, application-dev.yml
+    active: prod
   application:
     name: ${SPRING_APP_SECURITY_NAME:SpringSecurityUdemy}
   #    security:
@@ -17,15 +15,15 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:root}
   jpa:
-    show-sql: ${SPRING_JPA_SHOW_SQL:true}
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
     hibernate:
       ddl-auto: ${SPRING_HIBERNATE_DDL_AUTO:update}
     properties:
       hibernate:
-        format_sql: ${SPRING_HIBERNATE_FORMAT_SQL:true}
+        format_sql: ${SPRING_HIBERNATE_FORMAT_SQL:false}
 
 logging:
   pattern:
     console: ${LOGPATTERN_CONSOLE:%green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) - %msg%n}
   level:
-    org.springframework.security: ${SPRING_SECURITY_LOG_LEVEL:trace}
+    org.springframework.security: ${SPRING_SECURITY_LOG_LEVEL:ERROR}

@@ -5,9 +5,9 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:prod}
   config:
-    import: application.yml,application-prod.yml, application-local.yml, application-dev.yml
+    import: application-prod.yml, application-local.yml, application.yml
   application:
-    name: ${SPRING_APP_SECURITY_NAME:SpringSecurityUdemy}
+    name: ${SPRING_APP_SECURITY_NAME:springsection1}
   #    security:
   #      user:
   #        name: ${SPRING_APP_SECURITY_USERNAME:WRONGNAME}

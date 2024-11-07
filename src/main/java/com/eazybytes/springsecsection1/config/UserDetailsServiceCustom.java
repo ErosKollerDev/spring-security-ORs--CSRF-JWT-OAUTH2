@@ -2,9 +2,7 @@ package com.eazybytes.springsecsection1.config;
 
 import com.eazybytes.springsecsection1.entity.CustomerEntity;
 import com.eazybytes.springsecsection1.repository.CustomerRepository;
-import com.eazybytes.springsecsection1.service.CustomerService;
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,11 +11,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class UserDetailsCustomService implements UserDetailsService {
+public class UserDetailsServiceCustom implements UserDetailsService {
 
 
     //    private final CustomerService customerService;

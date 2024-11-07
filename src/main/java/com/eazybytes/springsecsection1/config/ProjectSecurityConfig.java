@@ -29,7 +29,7 @@ public class ProjectSecurityConfig {
 //                        .authenticated()
                             requests.requestMatchers("/my/**")
                                     .authenticated()
-                                    .requestMatchers("/contact", "/notices", "/error", "/admin/customers")
+                                    .requestMatchers("/contact", "/notices", "/error", "/register")
                                     .permitAll();
                         }
                 );

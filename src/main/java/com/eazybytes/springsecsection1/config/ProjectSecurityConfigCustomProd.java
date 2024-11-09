@@ -19,7 +19,10 @@ public class ProjectSecurityConfigCustomProd {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+                .requiresChannel(requestChannleConfiguration ->
+                        requestChannleConfiguration.anyRequest().requiresSecure()) // only HTTPS
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> {
 //                    requests.anyRequest()
 //                            .permitAll();

@@ -1,6 +1,11 @@
 #spring.application.name=springsection1
 
 
+server:
+  servlet:
+    session:
+      timeout: ${SESSION_TIMEOUT:5m}
+
 spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:prod}

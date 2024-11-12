@@ -1,10 +1,13 @@
 package com.eazybytes.springsecsection1.config;
 
+import com.eazybytes.springsecsection1.exceptionhandling.AccessDeniedHandlerCustom;
+import com.eazybytes.springsecsection1.exceptionhandling.BasicAuthenticationEntryPointCustom;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,6 +23,13 @@ public class ProjectSecurityConfigCustom {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
+
+//                Redirect to a custom page if the session is invalid
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.invalidSessionUrl("/invalid-session")
+                                .maximumSessions(3)
+                                .maxSessionsPreventsLogin(true))
+
 //                .requiresChannel(requestChannleConfiguration ->
 //                        requestChannleConfiguration.anyRequest().requiresInsecure())// only HTTP
                 .csrf(csrf -> csrf.disable())
@@ -30,16 +40,45 @@ public class ProjectSecurityConfigCustom {
 //                        .authenticated()
                             requests.requestMatchers("/my/**")
                                     .authenticated()
-                                    .requestMatchers("/contact", "/notices", "/error", "/register")
+                                    .requestMatchers("/contact", "/notices", "/error", "/register", "/invalid-session")
                                     .permitAll();
                         }
                 );
+
+        /*
+          Preventing session fixation strategy
+         */
+        //Default behavior, just changing que session ID, and not de details  Servlet 3.1
+        http.sessionManagement(sessionManagement ->
+                sessionManagement.sessionFixation(sessionFixation -> {}
+//                        sessionFixation.changeSessionId()
+        ));
+        //Create a new session
+        http.sessionManagement(sessionManagement ->
+                sessionManagement.sessionFixation(sessionFixation -> {}
+//                        sessionFixation.newSession()
+                ));
+
+        //Create a new session and copies all the exists session attributes to the new session (default for Servlet 3.0)
+        http.sessionManagement(sessionManagement ->
+                sessionManagement.sessionFixation(sessionFixation -> {}
+//                        sessionFixation.migrateSession()
+        ));
+
         http.formLogin(withDefaults());
 //        http.formLogin( f -> {
 //            f.disable();
 //        });
-        http.httpBasic(withDefaults());
+//        http.httpBasic(withDefaults());
+        http.httpBasic(hbc -> hbc.authenticationEntryPoint(new BasicAuthenticationEntryPointCustom()));
+        //Global config
+//        http.exceptionHandling( hbc-> hbc.authenticationEntryPoint(new BasicAuthenticationEntryPointCustom()));
 //        http.httpBasic(f -> f.disable());
+
+        http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new AccessDeniedHandlerCustom())
+//                .accessDeniedPage("/403-denied")
+        );
+
         return http.build();
     }
 

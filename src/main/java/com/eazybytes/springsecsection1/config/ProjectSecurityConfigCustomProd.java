@@ -1,5 +1,7 @@
 package com.eazybytes.springsecsection1.config;
 
+import com.eazybytes.springsecsection1.exceptionhandling.AccessDeniedHandlerCustom;
+import com.eazybytes.springsecsection1.exceptionhandling.BasicAuthenticationEntryPointCustom;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -20,8 +22,13 @@ public class ProjectSecurityConfigCustomProd {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
+//  Redirect to a custom page if the session is invalid
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.invalidSessionUrl("/invalid-session")
+                                .maximumSessions(1)
+                                .maxSessionsPreventsLogin(true))
                 .requiresChannel(requestChannleConfiguration ->
-                        requestChannleConfiguration.anyRequest().requiresSecure()) // only HTTPS
+                        requestChannleConfiguration.anyRequest().requiresSecure()) // only HTTPS for production
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> {
 //                    requests.anyRequest()
@@ -30,7 +37,7 @@ public class ProjectSecurityConfigCustomProd {
 //                        .authenticated()
                             requests.requestMatchers("/my/**")
                                     .authenticated()
-                                    .requestMatchers("/contact", "/notices", "/error", "/register")
+                                    .requestMatchers("/contact", "/notices", "/error", "/register","/invalid-session")
                                     .permitAll();
                         }
                 );
@@ -38,8 +45,16 @@ public class ProjectSecurityConfigCustomProd {
 //        http.formLogin( f -> {
 //            f.disable();
 //        });
-        http.httpBasic(withDefaults());
+//        http.httpBasic(withDefaults());
+        http.httpBasic(hbc -> hbc.authenticationEntryPoint(new BasicAuthenticationEntryPointCustom()));
+        //Global config
+//        http.exceptionHandling( hbc-> hbc.authenticationEntryPoint(new BasicAuthenticationEntryPointCustom()));
 //        http.httpBasic(f -> f.disable());
+
+        http.exceptionHandling(hbc -> hbc.accessDeniedHandler(new AccessDeniedHandlerCustom())
+//                .accessDeniedPage("/403-denied")
+        );
+
         return http.build();
     }
 

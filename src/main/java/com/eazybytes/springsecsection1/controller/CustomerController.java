@@ -35,8 +35,12 @@ public class CustomerController {
     @GetMapping("/customers/{id}")
     public ResponseEntity<CustomerEntity> getCustomersById(@PathVariable("id") Long id) {
         CustomerEntity byId = customerService.findById(id);
-        byId.setPwd(null);
-        return ResponseEntity.ok(byId);
+        if (byId != null) {
+            byId.setPwd("<PASSWORD REMOVED FROM RESPONSE>");
+            return ResponseEntity.ok(byId);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @PostMapping("/customers")
@@ -44,8 +48,8 @@ public class CustomerController {
         try {
             customerDTO.setPwd(this.passwordEncoder.encode(customerDTO.getPwd()));
             CustomerEntity saved = customerService.save(customerDTO);
-            if (saved != null && saved.getId() != null) {
-                saved.setId(null);
+            if (saved != null && saved.getCustomerId() != null) {
+                saved.setCustomerId(null);
                 return ResponseEntity.status(HttpStatus.CREATED).body(saved);
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to save customer");

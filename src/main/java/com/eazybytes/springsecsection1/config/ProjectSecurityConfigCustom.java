@@ -38,7 +38,7 @@ public class ProjectSecurityConfigCustom {
 //                            .permitAll();
 //                            .denyAll();
 //                        .authenticated()
-                            requests.requestMatchers("/my/**")
+                            requests.requestMatchers("/my/**", "/admin/**")
                                     .authenticated()
                                     .requestMatchers("/contact", "/notices", "/error", "/register", "/invalid-session")
                                     .permitAll();

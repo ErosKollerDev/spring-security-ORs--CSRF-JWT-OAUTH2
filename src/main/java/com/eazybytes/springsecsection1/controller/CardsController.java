@@ -1,20 +1,30 @@
 package com.eazybytes.springsecsection1.controller;
 
 
+import com.eazybytes.springsecsection1.entity.CardEntity;
+import com.eazybytes.springsecsection1.repository.CardRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/my")
+@RequiredArgsConstructor
 public class CardsController {
 
 
+    private final CardRepository cardRepository;
 
     @GetMapping("/cards")
-    public ResponseEntity<String> getCardsDetails() {
-        return ResponseEntity.ok("My Cards");
+    public ResponseEntity<List<CardEntity>> getCardsDetails(@RequestParam("id") Integer id) {
+        Optional<List<CardEntity>> byCustomerId = this.cardRepository.findByCustomerId(id);
+        return byCustomerId.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
 }

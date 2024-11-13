@@ -30,7 +30,9 @@ public class UserDetailsServiceCustom implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         CustomerEntity customerEntity =
-                this.customerRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
+                this.customerRepository.findByEmail(email)
+                        .orElseThrow(
+                                () -> new UsernameNotFoundException("User with email: " + email + " not found"));
         List<SimpleGrantedAuthority> simpleGrantedAuthorities = List.of(new SimpleGrantedAuthority(customerEntity.getRole()));
         User user = new User(customerEntity.getEmail(),
                 customerEntity.getPwd(),

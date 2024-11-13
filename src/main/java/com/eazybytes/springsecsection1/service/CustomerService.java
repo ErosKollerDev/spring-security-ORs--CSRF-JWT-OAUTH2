@@ -37,7 +37,7 @@ public class CustomerService {
 
     public List<CustomerEntity> getCustomers() {
         Iterable<CustomerEntity> all1 = customerRepository.findAll();
-        all1.forEach(customerEntity -> customerEntity.setPwd(null));
+        all1.forEach(customerEntity -> customerEntity.setPwd("<PASSWORD REMOVED FROM RESPONSE>"));
 
         return StreamSupport.stream(all1.spliterator(), false).toList();
 //        List<CustomerEntity> all = customerRepository.findAll();
@@ -55,7 +55,7 @@ public class CustomerService {
     }
 
     public CustomerEntity findById(Long id) {
-        return customerRepository.findById(id).orElse(null);
+        return customerRepository.findById(id.intValue()).orElse(null);
     }
 
 

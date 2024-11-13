@@ -21,6 +21,12 @@ public class UsernamePwdAuthenticationProviderCustom implements AuthenticationPr
     private final UserDetailsServiceCustom userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
+
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
+    }
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         log.info("CustomUsernamePwdAuthenticationProvider.authenticate(), SPRING_PROFILES_ACTIVE : {}",System.getenv("SPRING_PROFILES_ACTIVE"));
@@ -32,8 +38,5 @@ public class UsernamePwdAuthenticationProviderCustom implements AuthenticationPr
         return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
     }
 
-    @Override
-    public boolean supports(Class<?> authentication) {
-        return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
-    }
+
 }

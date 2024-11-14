@@ -2,6 +2,7 @@ package com.eazybytes.springsecsection1.config;
 
 import com.eazybytes.springsecsection1.exceptionhandling.AccessDeniedHandlerCustom;
 import com.eazybytes.springsecsection1.exceptionhandling.BasicAuthenticationEntryPointCustom;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -12,6 +13,11 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -32,6 +38,23 @@ public class ProjectSecurityConfigCustom {
 
 //                .requiresChannel(requestChannleConfiguration ->
 //                        requestChannleConfiguration.anyRequest().requiresInsecure())// only HTTP
+                .cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
+                    @Override
+                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                        CorsConfiguration config = new CorsConfiguration();
+                        config.addAllowedOrigin("http://localhost:4200");
+                        config.addAllowedOrigin("http://localhost:4201");
+                        config.addAllowedOrigin("http://*");
+                        config.addAllowedOrigin("https://*");
+//                        config.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+//                        config.setAllowedOrigins(Arrays.asList("http://localhost:4200") );
+                        config.setAllowedMethods(Collections.singletonList("*"));
+                        config.setAllowCredentials(true);
+                        config.setAllowedHeaders(Collections.singletonList("*"));
+                        config.setMaxAge(3600L/4);
+                        return config;
+                    }
+                }))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> {
 //                    requests.anyRequest()

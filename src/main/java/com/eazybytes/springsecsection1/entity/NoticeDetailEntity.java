@@ -1,5 +1,6 @@
 package com.eazybytes.springsecsection1.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -37,9 +38,11 @@ public class NoticeDetailEntity {
     @Column(name = "notic_end_dt")
     private LocalDate noticEndDt;
 
+    @JsonIgnore
     @Column(name = "create_dt")
     private LocalDate createDt;
 
+    @JsonIgnore
     @Column(name = "update_dt")
     private LocalDate updateDt;
 

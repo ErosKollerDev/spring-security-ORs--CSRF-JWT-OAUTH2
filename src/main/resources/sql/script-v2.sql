@@ -1,7 +1,7 @@
 create table customer (
     customer_id int not null auto_increment,
     name varchar(100) not null,
-    email varchar(100) not null,
+    email varchar(100) not null unique ,
     mobile_number varchar(20) not null,
     pwd varchar(600) not null,
     role varchar(30) not null,
@@ -156,3 +156,5 @@ where c.email = 'eros@gmail.com';
 
 delete from customer
 where email like 'test%';
+
+select * from notice_details;

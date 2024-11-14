@@ -28,6 +28,7 @@ public class CustomerEntity {
 
     @NotNull
     @NotEmpty
+    @Column(unique = true)
     private String email;
     @NotNull
     @NotEmpty

@@ -2,6 +2,7 @@ package com.eazybytes.springsecsection1.config;
 
 import com.eazybytes.springsecsection1.exceptionhandling.AccessDeniedHandlerCustom;
 import com.eazybytes.springsecsection1.exceptionhandling.BasicAuthenticationEntryPointCustom;
+import com.eazybytes.springsecsection1.filter.CsrfCookieFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,10 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -28,16 +33,29 @@ public class ProjectSecurityConfigCustom {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler();
+        csrfTokenRequestAttributeHandler.setCsrfRequestAttributeName("XSRF-TOKEN");
+
         http
 
 //                Redirect to a custom page if the session is invalid
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.invalidSessionUrl("/invalid-session")
-                                .maximumSessions(3)
-                                .maxSessionsPreventsLogin(true))
-
-//                .requiresChannel(requestChannleConfiguration ->
-//                        requestChannleConfiguration.anyRequest().requiresInsecure())// only HTTP
+//                .sessionManagement(sessionConfig ->
+//                        sessionConfig.invalidSessionUrl("/invalid-session")
+//                                .maximumSessions(3)
+//                                .maxSessionsPreventsLogin(true))
+                .securityContext(securityContextConfiguration -> securityContextConfiguration.requireExplicitSave(false))
+                .sessionManagement(sessionConfig -> sessionConfig
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                        .maximumSessions(3)
+                        .maxSessionsPreventsLogin(true))
+                .requiresChannel(requestChannleConfiguration ->
+                        requestChannleConfiguration.anyRequest().requiresInsecure())// only HTTP
+//                .csrf(csrf -> csrf.disable())
+                .csrf(csrfConfig -> csrfConfig
+                        .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -51,11 +69,11 @@ public class ProjectSecurityConfigCustom {
                         config.setAllowedMethods(Collections.singletonList("*"));
                         config.setAllowCredentials(true);
                         config.setAllowedHeaders(Collections.singletonList("*"));
-                        config.setMaxAge(3600L/4);
+                        config.setMaxAge(3600L / 4);
                         return config;
                     }
                 }))
-                .csrf(csrf -> csrf.disable())
+//                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> {
 //                    requests.anyRequest()
 //                            .permitAll();
@@ -73,20 +91,23 @@ public class ProjectSecurityConfigCustom {
          */
         //Default behavior, just changing que session ID, and not de details  Servlet 3.1
         http.sessionManagement(sessionManagement ->
-                sessionManagement.sessionFixation(sessionFixation -> {}
+                sessionManagement.sessionFixation(sessionFixation -> {
+                        }
 //                        sessionFixation.changeSessionId()
-        ));
+                ));
         //Create a new session
         http.sessionManagement(sessionManagement ->
-                sessionManagement.sessionFixation(sessionFixation -> {}
+                sessionManagement.sessionFixation(sessionFixation -> {
+                        }
 //                        sessionFixation.newSession()
                 ));
 
         //Create a new session and copies all the exists session attributes to the new session (default for Servlet 3.0)
         http.sessionManagement(sessionManagement ->
-                sessionManagement.sessionFixation(sessionFixation -> {}
+                sessionManagement.sessionFixation(sessionFixation -> {
+                        }
 //                        sessionFixation.migrateSession()
-        ));
+                ));
 
         http.formLogin(withDefaults());
 //        http.formLogin( f -> {

@@ -23,6 +23,7 @@ public class CustomerDTO {
 
 
     private Integer customerId;
+    private Integer id;
     @NotNull
     @NotEmpty
     private String email;

@@ -157,4 +157,7 @@ where c.email = 'eros@gmail.com';
 delete from customer
 where email like 'test%';
 
+delete from customer
+where customer_id = 7;
+
 select * from notice_details;

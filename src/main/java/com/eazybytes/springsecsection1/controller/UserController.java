@@ -43,8 +43,19 @@ public class UserController {
 
 
     @GetMapping("/user")
-    public ResponseEntity<CustomerEntity> getUserAfterLogin(Authentication authentication) {
-        return ResponseEntity.ok(customerService.findByEmail(authentication.getName()));
+    public ResponseEntity<CustomerDTO> getUserAfterLogin(Authentication authentication) {
+        CustomerEntity byEmail = customerService.findByEmail(authentication.getName());
+        CustomerDTO buildDTO = CustomerDTO.builder()
+                .customerId(byEmail.getCustomerId())
+                .id(byEmail.getCustomerId())
+                .email(byEmail.getEmail())
+                .pwd("<PASSWORD REMOVED FROM RESPONSE>")
+                .role(byEmail.getRole())
+                .mobileNumber(byEmail.getMobileNumber())
+                .name(byEmail.getName())
+                .createDt(byEmail.getCreateDt())
+                .build();
+        return ResponseEntity.ok(buildDTO);
     }
 
 

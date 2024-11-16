@@ -2,7 +2,10 @@ package com.eazybytes.springsecsection1.config;
 
 import com.eazybytes.springsecsection1.exceptionhandling.AccessDeniedHandlerCustom;
 import com.eazybytes.springsecsection1.exceptionhandling.BasicAuthenticationEntryPointCustom;
+import com.eazybytes.springsecsection1.filter.AuthoratiesLoggingAfterFilter;
+import com.eazybytes.springsecsection1.filter.AuthoratiesLoggingAtFilter;
 import com.eazybytes.springsecsection1.filter.CsrfCookieFilter;
+import com.eazybytes.springsecsection1.filter.RequestValidationEmailBeforeBasicFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,7 +58,10 @@ public class ProjectSecurityConfigCustom {
                         .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .ignoringRequestMatchers("/contact", "/register"))
+                .addFilterBefore(new RequestValidationEmailBeforeBasicFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .addFilterAt(new AuthoratiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoratiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
                 .cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {

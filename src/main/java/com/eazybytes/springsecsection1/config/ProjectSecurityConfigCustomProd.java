@@ -2,7 +2,10 @@ package com.eazybytes.springsecsection1.config;
 
 import com.eazybytes.springsecsection1.exceptionhandling.AccessDeniedHandlerCustom;
 import com.eazybytes.springsecsection1.exceptionhandling.BasicAuthenticationEntryPointCustom;
+import com.eazybytes.springsecsection1.filter.AuthoratiesLoggingAfterFilter;
+import com.eazybytes.springsecsection1.filter.AuthoratiesLoggingAtFilter;
 import com.eazybytes.springsecsection1.filter.CsrfCookieFilter;
+import com.eazybytes.springsecsection1.filter.RequestValidationEmailBeforeBasicFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,7 +59,10 @@ public class ProjectSecurityConfigCustomProd {
                         .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .ignoringRequestMatchers("/contact", "/register"))
+                .addFilterBefore(new RequestValidationEmailBeforeBasicFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .addFilterAt(new AuthoratiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoratiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
                 .cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -82,13 +88,13 @@ public class ProjectSecurityConfigCustomProd {
 //                            .denyAll();
 //                        .authenticated()
                             requests
-                                    .requestMatchers("/my/account").hasAnyAuthority("VIEWACCOUNT","MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/account").hasAnyAuthority("VIEWACCOUNT", "MASTER_OF_THE_UNIVERSE", "ADMIN")
                                     .requestMatchers("/my/account").hasAnyRole("ADMIN")
-                                    .requestMatchers("/my/cards").hasAnyAuthority("VIEWCARDS","MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/cards").hasAnyAuthority("VIEWCARDS", "MASTER_OF_THE_UNIVERSE", "ADMIN")
                                     .requestMatchers("/my/cards").hasAnyRole("ADMIN")
-                                    .requestMatchers("/my/loans").hasAnyAuthority("VIEWLOANS","MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/loans").hasAnyAuthority("VIEWLOANS", "MASTER_OF_THE_UNIVERSE", "ADMIN")
                                     .requestMatchers("/my/loans").hasAnyRole("ADMIN")
-                                    .requestMatchers("/my/balance").hasAnyAuthority("VIEWBALANCE","VIEWACCOUNT","MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/balance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT", "MASTER_OF_THE_UNIVERSE", "ADMIN")
                                     .requestMatchers("/contact", "/notices", "/error", "/register", "/invalid-session").permitAll();
                         }
                 );

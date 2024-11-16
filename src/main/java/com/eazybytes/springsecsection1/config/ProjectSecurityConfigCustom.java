@@ -49,12 +49,12 @@ public class ProjectSecurityConfigCustom {
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                         .maximumSessions(3)
                         .maxSessionsPreventsLogin(true))
-                .requiresChannel(requestChannleConfiguration ->
-                        requestChannleConfiguration.anyRequest().requiresInsecure())// only HTTP
-//                .csrf(csrf -> csrf.disable())
+                .requiresChannel(requestChannelConfiguration ->
+                        requestChannelConfiguration.anyRequest().requiresInsecure())// only HTTP
                 .csrf(csrfConfig -> csrfConfig
                         .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .ignoringRequestMatchers("/contact", "/register"))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
                     @Override
@@ -64,8 +64,6 @@ public class ProjectSecurityConfigCustom {
                         config.addAllowedOrigin("http://localhost:4201");
                         config.addAllowedOrigin("http://*");
                         config.addAllowedOrigin("https://*");
-//                        config.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
-//                        config.setAllowedOrigins(Arrays.asList("http://localhost:4200") );
                         config.setAllowedMethods(Collections.singletonList("*"));
                         config.setAllowCredentials(true);
                         config.setAllowedHeaders(Collections.singletonList("*"));
@@ -73,16 +71,22 @@ public class ProjectSecurityConfigCustom {
                         return config;
                     }
                 }))
-//                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> {
 //                    requests.anyRequest()
 //                            .permitAll();
 //                            .denyAll();
 //                        .authenticated()
-                            requests.requestMatchers("/my/**", "/admin/**")
-                                    .authenticated()
-                                    .requestMatchers("/contact", "/notices", "/error", "/register", "/invalid-session")
-                                    .permitAll();
+                            requests
+                                    .requestMatchers("/admin/**").authenticated()
+//                                    .requestMatchers("/my/**").authenticated()
+//                                    .requestMatchers("/my/account").hasAnyAuthority("VIEWACCOUNT","MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/account").hasAnyRole("ADMIN")
+//                                    .requestMatchers("/my/cards").hasAnyAuthority("VIEWCARDS","MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/cards").hasAnyRole("ADMIN")
+//                                    .requestMatchers("/my/loans").hasAnyAuthority("VIEWLOANS","MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/loans").hasAnyRole("ADMIN")
+//                                    .requestMatchers("/my/balance").hasAnyAuthority("VIEWBALANCE","VIEWACCOUNT","MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/contact", "/notices", "/error", "/register", "/invalid-session").permitAll();
                         }
                 );
 

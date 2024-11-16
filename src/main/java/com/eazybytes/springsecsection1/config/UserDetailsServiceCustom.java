@@ -1,5 +1,6 @@
 package com.eazybytes.springsecsection1.config;
 
+import com.eazybytes.springsecsection1.entity.AuthorityEntity;
 import com.eazybytes.springsecsection1.entity.CustomerEntity;
 import com.eazybytes.springsecsection1.repository.CustomerRepository;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,7 +35,20 @@ public class UserDetailsServiceCustom implements UserDetailsService {
                 this.customerRepository.findByEmail(email)
                         .orElseThrow(
                                 () -> new UsernameNotFoundException("User with email: " + email + " not found"));
-        List<SimpleGrantedAuthority> simpleGrantedAuthorities = List.of(new SimpleGrantedAuthority(customerEntity.getRole()));
+
+        List<AuthorityEntity> authoritiesEntities = customerEntity.getAuthorities();
+
+        List<SimpleGrantedAuthority> simpleGrantedAuthorities =
+                authoritiesEntities.stream()
+                        .map(authority ->
+                            new SimpleGrantedAuthority(authority.getName())
+                        )
+                        .toList();
+
+//        simpleGrantedAuthorities.removeAll(List.of(null));
+
+//        List<SimpleGrantedAuthority> simpleGrantedAuthorities = List.of(new SimpleGrantedAuthority(customerEntity.getRole())
+//                ,new SimpleGrantedAuthority(customerEntity.getRole()));
         User user = new User(customerEntity.getEmail(),
                 customerEntity.getPwd(),
                 true,

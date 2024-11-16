@@ -29,12 +29,13 @@ public class UsernamePwdAuthenticationProviderCustomDev implements Authenticatio
         String password = authentication.getCredentials().toString();
 
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-        if (this.passwordEncoder.matches(password, userDetails.getPassword())) {
-            //Your can fetch additional information from database, like age, country of origin etc
-            return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
-        } else {
-            throw new BadCredentialsException("Invalid credentials for user: " + username);
-        }
+        return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
+//        if (this.passwordEncoder.matches(password, userDetails.getPassword())) {
+//            //Your can fetch additional information from database, like age, country of origin etc
+//            return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
+//        } else {
+//            throw new BadCredentialsException("Invalid credentials for user: " + username);
+//        }
     }
 
     @Override

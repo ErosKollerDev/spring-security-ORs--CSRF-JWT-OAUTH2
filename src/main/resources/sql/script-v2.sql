@@ -161,3 +161,63 @@ delete from customer
 where customer_id = 7;
 
 select * from notice_details;
+
+
+
+create table authorities (
+    id int not null auto_increment,
+    customer_id int not null,
+    name varchar(50) not null,
+    primary key (id),
+    key customer_id (customer_id),
+    constraint fk_authorities_customer foreign key (customer_id) references customer (customer_id) on delete cascade
+);
+
+-- Assuming you want to select a customer's role based on their email and store it in a variable
+SET @customer_role1 := (SELECT role FROM customer WHERE email = 'eros@gmail.com');
+SET @customer_role2 := (SELECT role FROM customer WHERE email = 'user@gmail.com');
+SET @customer_role3 := (SELECT role FROM customer WHERE email = 'eros@gmail.com');
+SET @customer_role4 := (SELECT role FROM customer WHERE email = 'eros@gmail.com');
+insert into authorities(customer_id, name)
+select c.customer_id, 'MASTER_OF_THE_UNIVERSE'
+from customer c
+where c.email = 'eros@gmail.com';
+
+insert into authorities(customer_id, name)
+select c.customer_id, 'ADMIN'
+from customer c
+where c.email = 'eros@gmail.com';
+
+insert into authorities(customer_id, name)
+select c.customer_id, 'VIEWACCOUNT'
+from customer c
+where c.email = 'user@gmail.com';
+
+insert into authorities(customer_id, name)
+select c.customer_id, 'VIEWCARDS'
+from customer c
+where c.email = 'eros@gmail.com';
+
+insert into authorities(customer_id, name)
+select c.customer_id, 'VIEWLOANS'
+from customer c
+where c.email = 'eros@gmail.com';
+
+insert into authorities(customer_id, name)
+select c.customer_id, 'VIEWBALANCE'
+from customer c
+where c.email = 'eros@gmail.com';
+
+
+insert into authorities(customer_id, name)
+select c.customer_id, 'ROLE_ADMIN'
+from customer c
+where c.email = 'eros@gmail.com';
+
+
+select * from customer c;
+select * from authorities a
+where a.customer_id = 2;
+
+delete  from authorities
+where id  = 9;

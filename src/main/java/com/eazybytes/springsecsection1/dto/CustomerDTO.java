@@ -1,6 +1,7 @@
 package com.eazybytes.springsecsection1.dto;
 
 
+import com.eazybytes.springsecsection1.entity.AuthorityEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -28,9 +30,10 @@ public class CustomerDTO {
     @NotEmpty
     private String email;
     private String pwd;
-    private String role;
+//    private String role;
     private String mobileNumber;
     private String name;
     private LocalDateTime createDt;
+    private List<AuthorityEntity> authorities;
 
 }

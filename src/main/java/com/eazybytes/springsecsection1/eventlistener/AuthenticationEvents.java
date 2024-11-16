@@ -1,4 +1,4 @@
-package com.eazybytes.springsecsection1.event;
+package com.eazybytes.springsecsection1.eventlistener;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

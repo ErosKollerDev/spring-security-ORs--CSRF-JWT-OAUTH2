@@ -5,11 +5,13 @@ import com.eazybytes.springsecsection1.entity.CustomerEntity;
 import com.eazybytes.springsecsection1.entity.LoanEntity;
 import com.eazybytes.springsecsection1.repository.CustomerRepository;
 import com.eazybytes.springsecsection1.repository.LoanRepository;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -24,9 +26,9 @@ private final LoanRepository loanRepository;
 private final CustomerRepository customerRepository;
 
     @GetMapping("/loans")
-    public ResponseEntity<List<LoanEntity>> getLoansDetails(Authentication authentication) {
-        Optional<CustomerEntity> byEmail = this.customerRepository.findByEmail(authentication.getName());
-        Optional<List<LoanEntity>> byCustomer = this.loanRepository.findByCustomer(byEmail.get());
+    public ResponseEntity<List<LoanEntity>> getLoansDetails( @PathParam("id") Integer id) {
+        Optional<CustomerEntity> byId = this.customerRepository.findById(id);
+        Optional<List<LoanEntity>> byCustomer = this.loanRepository.findByCustomer(byId.get());
         return ResponseEntity.ok(byCustomer.get());
     }
 

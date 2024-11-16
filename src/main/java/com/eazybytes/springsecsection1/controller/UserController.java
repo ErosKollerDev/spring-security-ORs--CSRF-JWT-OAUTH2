@@ -50,10 +50,11 @@ public class UserController {
                 .id(byEmail.getCustomerId())
                 .email(byEmail.getEmail())
                 .pwd("<PASSWORD REMOVED FROM RESPONSE>")
-                .role(byEmail.getRole())
+//                .role(byEmail.getRole())
                 .mobileNumber(byEmail.getMobileNumber())
                 .name(byEmail.getName())
                 .createDt(byEmail.getCreateDt())
+                .authorities(byEmail.getAuthorities())
                 .build();
         return ResponseEntity.ok(buildDTO);
     }

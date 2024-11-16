@@ -5,17 +5,17 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+
+import com.eazybytes.springsecsection1.entity.AuthorityEntity;
 
 @Entity
 @Table(name = "customer")
-@Data
+@Getter @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,6 +34,9 @@ public class CustomerEntity {
     @NotEmpty
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String pwd;
+
+    @Deprecated
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
     @NotEmpty
     private String role;
@@ -50,5 +53,9 @@ public class CustomerEntity {
 
     @Column(name = "create_dt")
     private LocalDateTime createDt;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "customerId")
+    private List<AuthorityEntity> authorities;
+
 
 }

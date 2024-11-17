@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 
 @Slf4j
-public class JWTTokenGenaratorFilter extends OncePerRequestFilter {
+public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {

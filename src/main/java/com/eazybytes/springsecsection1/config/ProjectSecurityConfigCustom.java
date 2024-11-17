@@ -12,14 +12,12 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -54,12 +52,12 @@ public class ProjectSecurityConfigCustom {
                 .csrf(csrfConfig -> csrfConfig
                         .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/contact", "/register","/login/**"))
+                        .ignoringRequestMatchers("/contact","/contact-all", "/register","/login/**"))
                 .addFilterBefore(new RequestValidationEmailBeforeBasicFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterAt(new AuthoratiesLoggingAtFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoratiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new JWTTokenGenaratorFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
                     @Override
@@ -89,11 +87,12 @@ public class ProjectSecurityConfigCustom {
                                     .requestMatchers("/my/account").hasAnyRole("ADMIN")
                                     .requestMatchers("/my/cards").hasAnyAuthority("VIEWCARDS", "MASTER_OF_THE_UNIVERSE", "ADMIN")
                                     .requestMatchers("/my/cards").hasAnyRole("ADMIN")
-                                    .requestMatchers("/my/loans").hasAnyAuthority("VIEWLOANS", "MASTER_OF_THE_UNIVERSE", "ADMIN")
-                                    .requestMatchers("/my/loans").hasAnyRole("ADMIN")
+//                                    .requestMatchers("/my/loans").hasAnyAuthority("VIEWLOANS", "MASTER_OF_THE_UNIVERSE", "ADMIN")
+//                                    .requestMatchers("/my/loans").hasAnyRole("ADMIN")
+                                    .requestMatchers("/my/loans").authenticated()
                                     .requestMatchers("/my/balance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT", "MASTER_OF_THE_UNIVERSE", "ADMIN")
                                     .requestMatchers("/my/balance").hasAnyRole("ADMIN")
-                                    .requestMatchers("/contact", "/notices", "/error", "/register", "/invalid-session","/login/**").permitAll();
+                                    .requestMatchers("/contact","/contact-all", "/notices", "/error", "/register", "/invalid-session","/login/**").permitAll();
                         }
                 );
 

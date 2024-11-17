@@ -21,18 +21,15 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
 import java.util.stream.Collectors;
 
 
-
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/login")
 @AllArgsConstructor
-public class UserController {
+public class LoginController {
 
 
     private final CustomerService customerService;
@@ -40,7 +37,36 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final Environment env;
 
-    @PostMapping("/register")
+
+
+
+    @PostMapping("/singin")
+    public ResponseEntity<LoginResponseDTO> loginCustomer(@RequestBody LoginRequestDTO loginRequestDTO) {
+        String jwt = "";
+        Authentication authentication = UsernamePasswordAuthenticationToken.unauthenticated(loginRequestDTO.username(), loginRequestDTO.password());
+        Authentication authenticate = this.authenticationManager.authenticate(authentication);
+        if (authenticate != null && authenticate.isAuthenticated()) {
+            String secret = env.getProperty(ApplicationConstants.JWT_SECRET,
+                    ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
+            SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+            jwt = Jwts.builder().issuer("Eazy Bank").subject("JWT Token")
+                    .claim("username", authenticate.getName())
+                    .claim("authorities", authenticate.getAuthorities().stream().map(
+                            GrantedAuthority::getAuthority).collect(Collectors.joining(",")))
+                    .issuedAt(new Date())
+                    .expiration(new Date((new Date()).getTime() + (1000 * 60 * 60 * 24)))//30000000 86400000  (1000 * 60 * 60 * 24)
+                    .signWith(secretKey).compact();
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .header(ApplicationConstants.JWT_HEADER, jwt)
+                    .body(new LoginResponseDTO(HttpStatus.OK.getReasonPhrase(), jwt));
+        }else{
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+    }
+
+
+    @PostMapping("/singup")
     public ResponseEntity saveCustomer(@RequestBody CustomerDTO customerDTO) {
         try {
             customerDTO.setPwd(this.passwordEncoder.encode(customerDTO.getPwd()));
@@ -58,7 +84,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/user")
+    @GetMapping("/singin")
     public ResponseEntity<CustomerDTO> getUserAfterLogin(Authentication authentication) {
         CustomerEntity byEmail = customerService.findByEmail(authentication.getName());
         CustomerDTO buildDTO = CustomerDTO.builder()
@@ -74,6 +100,8 @@ public class UserController {
                 .build();
         return ResponseEntity.ok(buildDTO);
     }
+
+
 
 
 }

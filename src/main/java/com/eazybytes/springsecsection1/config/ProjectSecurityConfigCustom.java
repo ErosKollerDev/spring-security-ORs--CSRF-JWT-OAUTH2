@@ -2,17 +2,17 @@ package com.eazybytes.springsecsection1.config;
 
 import com.eazybytes.springsecsection1.exceptionhandling.AccessDeniedHandlerCustom;
 import com.eazybytes.springsecsection1.exceptionhandling.BasicAuthenticationEntryPointCustom;
-import com.eazybytes.springsecsection1.filter.AuthoratiesLoggingAfterFilter;
-import com.eazybytes.springsecsection1.filter.AuthoratiesLoggingAtFilter;
-import com.eazybytes.springsecsection1.filter.CsrfCookieFilter;
-import com.eazybytes.springsecsection1.filter.RequestValidationEmailBeforeBasicFilter;
+import com.eazybytes.springsecsection1.filter.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -43,25 +43,24 @@ public class ProjectSecurityConfigCustom {
         http
 
 //                Redirect to a custom page if the session is invalid
-//                .sessionManagement(sessionConfig ->
-//                        sessionConfig.invalidSessionUrl("/invalid-session")
-//                                .maximumSessions(3)
-//                                .maxSessionsPreventsLogin(true))
-                .securityContext(securityContextConfiguration -> securityContextConfiguration.requireExplicitSave(false))
+                /* not required when working with stateless session jwt token */
+//                .securityContext(securityContextConfiguration -> securityContextConfiguration.requireExplicitSave(false))
                 .sessionManagement(sessionConfig -> sessionConfig
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-                        .maximumSessions(3)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .maximumSessions(300)
                         .maxSessionsPreventsLogin(true))
                 .requiresChannel(requestChannelConfiguration ->
                         requestChannelConfiguration.anyRequest().requiresInsecure())// only HTTP
                 .csrf(csrfConfig -> csrfConfig
                         .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/contact", "/register"))
+                        .ignoringRequestMatchers("/contact", "/register","/login/**"))
                 .addFilterBefore(new RequestValidationEmailBeforeBasicFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterAt(new AuthoratiesLoggingAtFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoratiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTTokenGenaratorFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -71,6 +70,7 @@ public class ProjectSecurityConfigCustom {
                         config.addAllowedOrigin("http://*");
                         config.addAllowedOrigin("https://*");
                         config.setAllowedMethods(Collections.singletonList("*"));
+                        config.setExposedHeaders(Arrays.asList("Authorization"));
                         config.setAllowCredentials(true);
                         config.setAllowedHeaders(Collections.singletonList("*"));
                         config.setMaxAge(3600L / 4);
@@ -85,14 +85,15 @@ public class ProjectSecurityConfigCustom {
                             requests
                                     .requestMatchers("/admin/**").authenticated()
 //                                    .requestMatchers("/my/**").authenticated()
-//                                    .requestMatchers("/my/account").hasAnyAuthority("VIEWACCOUNT","MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/account").hasAnyAuthority("VIEWACCOUNT", "MASTER_OF_THE_UNIVERSE", "ADMIN")
                                     .requestMatchers("/my/account").hasAnyRole("ADMIN")
-//                                    .requestMatchers("/my/cards").hasAnyAuthority("VIEWCARDS","MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/cards").hasAnyAuthority("VIEWCARDS", "MASTER_OF_THE_UNIVERSE", "ADMIN")
                                     .requestMatchers("/my/cards").hasAnyRole("ADMIN")
-//                                    .requestMatchers("/my/loans").hasAnyAuthority("VIEWLOANS","MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/loans").hasAnyAuthority("VIEWLOANS", "MASTER_OF_THE_UNIVERSE", "ADMIN")
                                     .requestMatchers("/my/loans").hasAnyRole("ADMIN")
-//                                    .requestMatchers("/my/balance").hasAnyAuthority("VIEWBALANCE","VIEWACCOUNT","MASTER_OF_THE_UNIVERSE", "ADMIN")
-                                    .requestMatchers("/contact", "/notices", "/error", "/register", "/invalid-session").permitAll();
+                                    .requestMatchers("/my/balance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT", "MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/balance").hasAnyRole("ADMIN")
+                                    .requestMatchers("/contact", "/notices", "/error", "/register", "/invalid-session","/login/**").permitAll();
                         }
                 );
 
@@ -155,5 +156,14 @@ public class ProjectSecurityConfigCustom {
     public CompromisedPasswordChecker compromisedPasswordChecker() {
         HaveIBeenPwnedRestApiPasswordChecker haveIBeenPwnedRestApiPasswordChecker = new HaveIBeenPwnedRestApiPasswordChecker();
         return haveIBeenPwnedRestApiPasswordChecker;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(UserDetailsServiceCustom userDetailsService, PasswordEncoder passwordEncoder) throws Exception {
+        UsernamePwdAuthenticationProviderCustom usernamePwdAuthenticationProviderCustom =
+                new UsernamePwdAuthenticationProviderCustom(userDetailsService, passwordEncoder);
+        ProviderManager providerManager = new ProviderManager(usernamePwdAuthenticationProviderCustom);
+        providerManager.setEraseCredentialsAfterAuthentication(false);
+        return providerManager;
     }
 }

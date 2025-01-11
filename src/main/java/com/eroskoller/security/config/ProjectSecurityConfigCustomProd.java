@@ -1,7 +1,7 @@
 package com.eroskoller.security.config;
 
 import com.eroskoller.security.exceptionhandling.AccessDeniedHandlerCustom;
-import com.eazybytes.springsecsection1.filter.*;
+import com.eroskoller.security.filter.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

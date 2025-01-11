@@ -28,10 +28,16 @@ private final CustomerRepository customerRepository;
 
     @GetMapping("/loans")
 //    @PostAuthorize("hasRole('USER')")
-    public ResponseEntity<List<LoanEntity>> getLoansDetails( @PathParam("id") Integer id) {
-        Optional<CustomerEntity> byId = this.customerRepository.findById(id);
-        Optional<List<LoanEntity>> byCustomer = this.loanRepository.findByCustomer(byId.get());
-        return ResponseEntity.ok(byCustomer.get());
+    public ResponseEntity<List<LoanEntity>> getLoansDetails( @PathParam("email")String email) {
+        Optional<CustomerEntity> byEmail = this.customerRepository.findByEmail(email);
+        if(byEmail.isPresent()){
+            Optional<CustomerEntity> byId = this.customerRepository.findById(byEmail.get().getCustomerId());
+            Optional<List<LoanEntity>> byCustomer = this.loanRepository.findByCustomer(byId.get());
+            return ResponseEntity.ok(byCustomer.get());
+        }else{
+            return null;
+        }
+
     }
 
 }

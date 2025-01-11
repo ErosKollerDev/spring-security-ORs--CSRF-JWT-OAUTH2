@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -34,6 +35,9 @@ public class ProjectSecurityConfigCustomProd {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new KeyCloakRoleConverter());
 
         CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler();
         csrfTokenRequestAttributeHandler.setCsrfRequestAttributeName("XSRF-TOKEN");
@@ -58,12 +62,12 @@ public class ProjectSecurityConfigCustomProd {
                         .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .ignoringRequestMatchers("/contact", "/register","/login/**"))
-                .addFilterBefore(new RequestValidationEmailBeforeBasicFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-                .addFilterAt(new AuthoratiesLoggingAtFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new AuthoratiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
+//                .addFilterBefore(new RequestValidationEmailBeforeBasicFilter(), BasicAuthenticationFilter.class)
+//                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+//                .addFilterAt(new AuthoratiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+//                .addFilterAfter(new AuthoratiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+//                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+//                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -126,16 +130,16 @@ public class ProjectSecurityConfigCustomProd {
 //                        sessionFixation.migrateSession()
                 ));
 
-        http.formLogin(withDefaults());
+//        http.formLogin(withDefaults());
 //        http.formLogin( f -> {
 //            f.disable();
 //        });
 //        http.httpBasic(withDefaults());
-        http.httpBasic(hbc -> hbc.authenticationEntryPoint(new BasicAuthenticationEntryPointCustom()));
+//        http.httpBasic(hbc -> hbc.authenticationEntryPoint(new BasicAuthenticationEntryPointCustom()));
         //Global config
 //        http.exceptionHandling( hbc-> hbc.authenticationEntryPoint(new BasicAuthenticationEntryPointCustom()));
 //        http.httpBasic(f -> f.disable());
-
+        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
         http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new AccessDeniedHandlerCustom())
 //                .accessDeniedPage("/403-denied")
         );
@@ -151,20 +155,23 @@ public class ProjectSecurityConfigCustomProd {
 //    }
 
 
-    @Bean
+    @Deprecated
+//    @Bean
     public PasswordEncoder passwordEncoder() {
 //        return new BCryptPasswordEncoder();
         PasswordEncoder delegatingPasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();// will be used by Spring Security BCryptPasswordEncoder by default
         return delegatingPasswordEncoder;
     }
 
-    @Bean
+    @Deprecated
+//    @Bean
     public CompromisedPasswordChecker compromisedPasswordChecker() {
         HaveIBeenPwnedRestApiPasswordChecker haveIBeenPwnedRestApiPasswordChecker = new HaveIBeenPwnedRestApiPasswordChecker();
         return haveIBeenPwnedRestApiPasswordChecker;
     }
 
-    @Bean
+    @Deprecated
+//    @Bean
     public AuthenticationManager authenticationManager(UserDetailsServiceCustom userDetailsService, PasswordEncoder passwordEncoder) throws Exception {
         UsernamePwdAuthenticationProviderCustomProd usernamePwdAuthenticationProviderCustom =
                 new UsernamePwdAuthenticationProviderCustomProd(userDetailsService, passwordEncoder);

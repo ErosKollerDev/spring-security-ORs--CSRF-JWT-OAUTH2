@@ -24,8 +24,10 @@ public class BalanceController {
     private final AccountTransactionRepository accountTransactionRepository;
 
     @GetMapping("balance")
-    public ResponseEntity<List<AccountTransactionEntity>> getBalanceDetails(@RequestParam("id") Integer id) {
+    public ResponseEntity<List<AccountTransactionEntity>> getBalanceDetails(@RequestParam("email") String email) {
 //        Optional<CustomerEntity> byId = this.customerRepository.findById(id);
+        CustomerEntity customerEntity = customerRepository.findByEmail(email).orElse(null);
+        Integer id = customerEntity.getCustomerId();
         List<AccountTransactionEntity> byCustomer =  this.accountTransactionRepository.findByCustomerIdOrderByTransactionDt(id); //this.accountTransactionRepository.findByCustomerId(id);
         if (byCustomer != null) {
             return ResponseEntity.ok(byCustomer);

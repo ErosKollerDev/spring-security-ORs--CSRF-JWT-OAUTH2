@@ -4,9 +4,11 @@ import com.eazybytes.springsecsection1.exceptionhandling.AccessDeniedHandlerCust
 import com.eazybytes.springsecsection1.exceptionhandling.BasicAuthenticationEntryPointCustom;
 import com.eazybytes.springsecsection1.filter.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
@@ -14,6 +16,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -21,6 +24,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,9 +35,21 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Profile("!prod")
 public class ProjectSecurityConfigCustom {
 
+//    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-uri}")
+//    String introspectionUri;
+//
+//    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-id}")
+//    String clientId;
+//
+//    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-secret}")
+//    String clientSecret;
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new KeyCloakRoleConverter());
 
         CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler();
         csrfTokenRequestAttributeHandler.setCsrfRequestAttributeName("XSRF-TOKEN");
@@ -52,13 +68,13 @@ public class ProjectSecurityConfigCustom {
                 .csrf(csrfConfig -> csrfConfig
                         .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/contact","/contact-all", "/register","/login/**"))
-                .addFilterBefore(new RequestValidationEmailBeforeBasicFilter(), BasicAuthenticationFilter.class)
+                        .ignoringRequestMatchers("/contact", "/contact-all", "/register", "/login/**"))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-                .addFilterAt(new AuthoratiesLoggingAtFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new AuthoratiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
+//                .addFilterBefore(new RequestValidationEmailBeforeBasicFilter(), BasicAuthenticationFilter.class)
+//                .addFilterAt(new AuthoratiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+//                .addFilterAfter(new AuthoratiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+//                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+//                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -83,16 +99,17 @@ public class ProjectSecurityConfigCustom {
                             requests
                                     .requestMatchers("/admin/**").authenticated()
 //                                    .requestMatchers("/my/**").authenticated()
-                                    .requestMatchers("/my/account").hasAnyAuthority("VIEWACCOUNT", "MASTER_OF_THE_UNIVERSE", "ADMIN")
-                                    .requestMatchers("/my/account").hasAnyRole("ADMIN")
-                                    .requestMatchers("/my/cards").hasAnyAuthority("VIEWCARDS", "MASTER_OF_THE_UNIVERSE", "ADMIN")
-                                    .requestMatchers("/my/cards").hasAnyRole("ADMIN")
+//                                    .requestMatchers("/my/account").hasAnyAuthority("VIEWACCOUNT", "MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/account").hasAnyRole("ADMIN", "USER")
+//                                    .requestMatchers("/my/account").hasRole("ADMIN")
+//                                    .requestMatchers("/my/cards").hasAnyAuthority("VIEWCARDS", "MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/cards").hasAnyRole("ADMIN", "USER")
 //                                    .requestMatchers("/my/loans").hasAnyAuthority("VIEWLOANS", "MASTER_OF_THE_UNIVERSE", "ADMIN")
-//                                    .requestMatchers("/my/loans").hasAnyRole("ADMIN")
-                                    .requestMatchers("/my/loans").authenticated()
-                                    .requestMatchers("/my/balance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT", "MASTER_OF_THE_UNIVERSE", "ADMIN")
-                                    .requestMatchers("/my/balance").hasAnyRole("ADMIN")
-                                    .requestMatchers("/contact","/contact-all", "/notices", "/error", "/register", "/invalid-session","/login/**").permitAll();
+                                    .requestMatchers("/my/loans").hasAnyRole("ADMIN", "USER")
+//                                    .requestMatchers("/my/loans").authenticated()
+//                                    .requestMatchers("/my/balance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT", "MASTER_OF_THE_UNIVERSE", "ADMIN")
+                                    .requestMatchers("/my/balance").hasAnyRole("ADMIN", "USER")
+                                    .requestMatchers("/contact", "/contact-all", "/notices", "/error", "/register", "/invalid-session", "/login/**").permitAll();
                         }
                 );
 
@@ -119,16 +136,22 @@ public class ProjectSecurityConfigCustom {
 //                        sessionFixation.migrateSession()
                 ));
 
-        http.formLogin(withDefaults());
+//        http.formLogin(withDefaults());
 //        http.formLogin( f -> {
 //            f.disable();
 //        });
 //        http.httpBasic(withDefaults());
-        http.httpBasic(hbc -> hbc.authenticationEntryPoint(new BasicAuthenticationEntryPointCustom()));
+//        http.httpBasic(hbc -> hbc.authenticationEntryPoint(new BasicAuthenticationEntryPointCustom()));
         //Global config
 //        http.exceptionHandling( hbc-> hbc.authenticationEntryPoint(new BasicAuthenticationEntryPointCustom()));
 //        http.httpBasic(f -> f.disable());
 
+        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+//        http.oauth2ResourceServer(oauth2 -> oauth2.opaqueToken(opaqueToken ->
+//                opaqueToken.authenticationConverter(new KeyCloakOpaqueConverter())
+//                        .introspectionUri(introspectionUri)
+//                        .introspectionClientCredentials(clientId, clientSecret)
+//        ));
         http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new AccessDeniedHandlerCustom())
 //                .accessDeniedPage("/403-denied")
         );
@@ -143,21 +166,23 @@ public class ProjectSecurityConfigCustom {
 //        return jdbcUserDetailsManager;
 //    }
 
-
-    @Bean
+    @Deprecated
+//    @Bean
     public PasswordEncoder passwordEncoder() {
 //        return new BCryptPasswordEncoder();
         PasswordEncoder delegatingPasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();// will be used by Spring Security BCryptPasswordEncoder by default
         return delegatingPasswordEncoder;
     }
 
-    @Bean
+    @Deprecated
+//    @Bean
     public CompromisedPasswordChecker compromisedPasswordChecker() {
         HaveIBeenPwnedRestApiPasswordChecker haveIBeenPwnedRestApiPasswordChecker = new HaveIBeenPwnedRestApiPasswordChecker();
         return haveIBeenPwnedRestApiPasswordChecker;
     }
 
-    @Bean
+    @Deprecated
+//    @Bean
     public AuthenticationManager authenticationManager(UserDetailsServiceCustom userDetailsService, PasswordEncoder passwordEncoder) throws Exception {
         UsernamePwdAuthenticationProviderCustom usernamePwdAuthenticationProviderCustom =
                 new UsernamePwdAuthenticationProviderCustom(userDetailsService, passwordEncoder);

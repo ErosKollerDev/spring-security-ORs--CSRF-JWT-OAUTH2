@@ -11,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Deprecated
 @Slf4j
 public class AuthoratiesLoggingAfterFilter extends OncePerRequestFilter {
     @Override

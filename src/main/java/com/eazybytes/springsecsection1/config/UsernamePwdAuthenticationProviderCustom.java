@@ -11,9 +11,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-@Component
+@Deprecated
+//@Component
 //@Profile({"default", "dev", "local"})
-@Profile({"default", "local"})
+//@Profile({"default", "local"})
 @RequiredArgsConstructor
 @Slf4j
 public class UsernamePwdAuthenticationProviderCustom implements AuthenticationProvider {

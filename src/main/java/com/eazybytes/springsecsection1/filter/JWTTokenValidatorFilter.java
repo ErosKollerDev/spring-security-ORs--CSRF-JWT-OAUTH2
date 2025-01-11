@@ -21,7 +21,7 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-
+@Deprecated
 @Slf4j
 public class JWTTokenValidatorFilter extends OncePerRequestFilter {
     @Override

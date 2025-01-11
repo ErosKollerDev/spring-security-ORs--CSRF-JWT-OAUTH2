@@ -61,3 +61,52 @@ In summary, this command hashes the string "ErosKoller" using the SHA-256 algori
 
 ## Brute force Attack
 
+
+----------------------------------
+
+## KeyCloak
+docker run -p 8180:8080 -d -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:26.0.5 start-dev
+
+Docs
+### Keycloak API's
+http://localhost:8180/realms/springbootsecuritydev/.well-known/openid-configuration
+
+Access Token URL
+http://localhost:8180/realms/springbootsecuritydev/protocol/openid-connect/token
+
+http://localhost:8180/realms/springbootsecuritydev/protocol/openid-connect/certs
+
+Keycloak 
+user: eroskoller
+pass: eroskoller
+
+Realm: springbootsecuritydev
+clientId: keycloak_clientid
+Client Secret: NmHalpSOAHjWBy8UYYcvwhCO7JEP0IP9
+
+----------------------------------
+Opaque Toke
+
+clientId: keycloak_clientid_introspect
+clientSecret: d3MhUJX4PkcVgfTRL6qEYI1cU30LGpEK
+
+----------------------------------
+Grant Type Flow
+
+clientId: client_4_auth_grant_type_flow
+clientSecret: lEdiKbesl5iJtSH8ObBq1CvQfE7uY9DT
+
+User
+name: zero@gmail.com
+pass: zero123456
+
+----------------------------------
+
+PKCE
+
+clientId: client_4_pkce
+
+User
+name: zero@gmail.com
+pass: zero123456
+

@@ -7,6 +7,15 @@ server:
       timeout: ${SESSION_TIMEOUT:15m}
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JWK-SET-URI:http://localhost:8180/realms/springbootsecuritydev/protocol/openid-connect/certs}
+#        opaque:
+#          introspection-uri: ${INTROSPECT_URI:http://localhost:8180/realms/springbootsecuritydev/protocol/openid-connect/token/introspect}
+#          introspection-client-id: ${INTROSPECT_ID:keycloak_clientid_introspect}
+#          introspection-client-secret: ${INTROSPECT_SECRET:d3MhUJX4PkcVgfTRL6qEYI1cU30LGpEK}
   config:
     active: prod
   application:

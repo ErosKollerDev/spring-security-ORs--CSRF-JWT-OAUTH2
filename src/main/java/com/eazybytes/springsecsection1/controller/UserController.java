@@ -36,26 +36,26 @@ public class UserController {
 
 
     private final CustomerService customerService;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
+//    private final PasswordEncoder passwordEncoder;
+//    private final AuthenticationManager authenticationManager;
     private final Environment env;
 
-    @PostMapping("/register")
-    public ResponseEntity saveCustomer(@RequestBody CustomerDTO customerDTO) {
-        try {
-            customerDTO.setPwd(this.passwordEncoder.encode(customerDTO.getPwd()));
-            customerDTO.setCreateDt(LocalDateTime.now());
-            CustomerEntity saved = customerService.save(customerDTO);
-            if (saved != null && saved.getCustomerId() != null) {
-//                saved.setPwd("<PASSWORD REMOVED FROM RESPONSE>");
-                return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to save customer");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
+//    @PostMapping("/register")
+//    public ResponseEntity saveCustomer(@RequestBody CustomerDTO customerDTO) {
+//        try {
+//            customerDTO.setPwd(this.passwordEncoder.encode(customerDTO.getPwd()));
+//            customerDTO.setCreateDt(LocalDateTime.now());
+//            CustomerEntity saved = customerService.save(customerDTO);
+//            if (saved != null && saved.getCustomerId() != null) {
+////                saved.setPwd("<PASSWORD REMOVED FROM RESPONSE>");
+//                return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+//            } else {
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to save customer");
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//    }
 
 
     @GetMapping("/user")

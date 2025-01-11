@@ -20,7 +20,7 @@ public class CustomerController {
 
 
     private final CustomerService customerService;
-    private final PasswordEncoder passwordEncoder;
+//    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/customers")
     public ResponseEntity<List<CustomerEntity>> getCustomers() {
@@ -43,22 +43,22 @@ public class CustomerController {
         }
     }
 
-    @PostMapping("/customers")
-    public ResponseEntity saveCustomer(@RequestBody CustomerDTO customerDTO) {
-        try {
-            customerDTO.setPwd(this.passwordEncoder.encode(customerDTO.getPwd()));
-            CustomerEntity saved = customerService.save(customerDTO);
-            if (saved != null && saved.getCustomerId() != null) {
-                saved.setCustomerId(null);
-                return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to save customer");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-
-    }
+//    @PostMapping("/customers")
+//    public ResponseEntity saveCustomer(@RequestBody CustomerDTO customerDTO) {
+//        try {
+//            customerDTO.setPwd(this.passwordEncoder.encode(customerDTO.getPwd()));
+//            CustomerEntity saved = customerService.save(customerDTO);
+//            if (saved != null && saved.getCustomerId() != null) {
+//                saved.setCustomerId(null);
+//                return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+//            } else {
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to save customer");
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//
+//    }
 
 
 }

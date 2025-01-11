@@ -21,8 +21,8 @@ public class AccountController {
     private final CustomerRepository customerRepository;
 
     @GetMapping("/account")
-    public ResponseEntity<List<AccountEntity>> getAccountDetails(@RequestParam("id") Integer id) {
-        CustomerEntity customerEntity = customerRepository.findById(id).orElse(null);
+    public ResponseEntity<List<AccountEntity>> getAccountDetails(@RequestParam("email") String email) {
+        CustomerEntity customerEntity = customerRepository.findByEmail(email).orElse(null);
         if(customerEntity != null){
             List<AccountEntity> byCustomer = accountRepository.findByCustomer(customerEntity);
             return ResponseEntity.ok(byCustomer);
